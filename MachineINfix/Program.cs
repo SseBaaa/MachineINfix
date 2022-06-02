@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MachineINfix
 {
-    public enum OperatorType { MULTIPLY, DIVIDE, ADD, SUBTRACT, EXPONENTIAL, OPAREN, CPAREN, VARIABLE, SIN, COS, TG, CTG, LN, LOG, LD, EXP};
+    public enum OperatorType { MULTIPLY, DIVIDE, ADD, SUBTRACT, EXPONENTIAL, OPAREN, CPAREN, VARIABLE, SIN, COS, TG, CTG, LN, LOG, LD, EXP, TOCKA, E, EMALO};
     public interface Element
     {
     }
@@ -49,9 +49,9 @@ namespace MachineINfix
             else if (op == '^')
                 type = OperatorType.EXPONENTIAL;
             else if (op == 'e')
-                type = OperatorType.EXPONENTIAL;
+                type = OperatorType.EMALO;
             else if (op == 'E')
-                type = OperatorType.EXPONENTIAL;
+                type = OperatorType.E;
             else if (op == '(')
                 type = OperatorType.OPAREN;
             else if (op == ')')
@@ -60,9 +60,17 @@ namespace MachineINfix
                 type = OperatorType.VARIABLE;
             else if (op == 's')
             {
-                type = OperatorType.SIN;
+               sin ++;
             }
-                
+            else if (op == 'i')
+            {
+                sin ++;
+            }
+            else if (op == 'n' && sin == 2)
+                type = OperatorType.SIN;
+            else if (op == '.')
+                type = OperatorType.TOCKA;
+
         }
 
         public override String ToString()
@@ -94,7 +102,7 @@ namespace MachineINfix
                 }
 
                 if (c == '+' || c == '-' || c == '*' || c == '/' || c == '^'
-                        || c == '(' || c == ')' || c == 'e' || c == 'E' || c == 's')
+                        || c == '(' || c == ')' || c == 'e' || c == 'E' || c == 'n' || c == '.' )
                     e.Add(new OperatorElement(c));
             }
             if (sb.Length > 0)
@@ -110,16 +118,16 @@ namespace MachineINfix
         List<Element> converted = new List<Element>();
         int Precedence(OperatorElement c)
         {
-            if (c.type == OperatorType.EXPONENTIAL)
+            if ( c.type == OperatorType.E || c.type == OperatorType.EXPONENTIAL || c.type == OperatorType.TOCKA)
                 return 2;
-            else if (c.type == OperatorType.MULTIPLY || c.type == OperatorType.DIVIDE)
+            else if (c.type == OperatorType.EMALO || c.type == OperatorType.MULTIPLY || c.type == OperatorType.DIVIDE)
                 return 3;
-            else if (c.type == OperatorType.ADD || c.type == OperatorType.SUBTRACT)
+            else if ( c.type == OperatorType.ADD || c.type == OperatorType.SUBTRACT)
                 return 4;
             else if (c.type == OperatorType.VARIABLE)
                 return 5;
-            else if (c.type == OperatorType.SIN)
-                return 6;
+            
+            
             else
                 return Int32.MaxValue;
         }
@@ -204,11 +212,35 @@ namespace MachineINfix
                 temp = Math.Pow(left.getNumber(), right.getNumber());
             else if (op.type == OperatorType.VARIABLE)
                 temp = right.getNumber();
-            else if(op.type == OperatorType.SIN)
+            else if (op.type == OperatorType.EMALO)
             {
-                double v = Math.Sin(right.getNumber());
-                temp = v;
+                temp = left.getNumber() * Math.E;
+                
+
             }
+            else if (op.type == OperatorType.E)
+                temp = left.getNumber() * Math.Pow(10, right.getNumber());
+            else if (op.type == OperatorType.TOCKA)
+            {
+                if(right.getNumber() < 10 && right.getNumber() > 0)
+                {
+                    temp = right.getNumber() / 10 + left.getNumber();
+                }
+                if (right.getNumber() < 100 && right.getNumber() >= 10)
+                {
+                    temp = right.getNumber() / 100 + left.getNumber();
+                }
+                if (right.getNumber() < 1000 && right.getNumber() >= 100)
+                {
+                    temp = right.getNumber() / 1000 + left.getNumber();
+                }
+                if (right.getNumber() < 10000 && right.getNumber() >= 1000)
+                {
+                    temp = right.getNumber() / 10000 + left.getNumber();
+                }
+            }  
+            else if (op.type == OperatorType.SIN)
+                temp = Math.Sin(right.getNumber());
 
             return new NumberElement(temp.ToString());
         }
