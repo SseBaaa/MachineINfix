@@ -118,7 +118,7 @@ namespace MachineINfix
         List<Element> converted = new List<Element>();
         int Precedence(OperatorElement c)
         {
-            if ( c.type == OperatorType.E || c.type == OperatorType.EXPONENTIAL || c.type == OperatorType.TOCKA)
+            if ( c.type == OperatorType.E || c.type == OperatorType.EXPONENTIAL || c.type == OperatorType.TOCKA || c.type == OperatorType.SIN)
                 return 2;
             else if (c.type == OperatorType.EMALO || c.type == OperatorType.MULTIPLY || c.type == OperatorType.DIVIDE)
                 return 3;
@@ -203,7 +203,18 @@ namespace MachineINfix
             if (op.type == OperatorType.ADD)
                 temp = left.getNumber() + right.getNumber();
             else if (op.type == OperatorType.SUBTRACT)
-                temp = left.getNumber() - right.getNumber();
+            {
+                if (left.getNumber() == null)
+                {
+                    temp = -1 * right.getNumber();
+                }
+                else
+                {
+                    temp = left.getNumber() - right.getNumber();
+                }
+                
+            }
+                
             else if (op.type == OperatorType.MULTIPLY)
                 temp = left.getNumber() * right.getNumber();
             else if (op.type == OperatorType.DIVIDE)
@@ -293,6 +304,7 @@ namespace MachineINfix
 
                 case 'e':
                     return 3;
+                
             }
             return -1;
         }
@@ -366,10 +378,22 @@ namespace MachineINfix
         }
         static void Main(string[] args)
         {
+            string expa = "";
             string exp = Console.ReadLine();
+            if (exp.EndsWith("e") || exp.EndsWith("+") || exp.EndsWith("-") ||  exp.EndsWith("E"))
+            {
+                expa = "0" + exp + "0";
+            }
+            else
+            {
+                expa = "0" + exp;
+            }
+
+            expa = exp.Replace("e", "e0");
+
             Console.WriteLine(infixToPostfix(exp));
             Program c = new Program();
-            double d = c.Calculate(exp);
+            double d = c.Calculate(expa);
             Console.WriteLine(d);
             Console.ReadKey();
         
