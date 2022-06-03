@@ -34,9 +34,11 @@ namespace MachineINfix
     {
         public OperatorType type;
         char c;
+        int brojac = 0;
         public OperatorElement(char op)
         {
-            int sin = 0;
+          
+            
             c = op;
             if (op == '+')
                 type = OperatorType.ADD;
@@ -58,18 +60,26 @@ namespace MachineINfix
                 type = OperatorType.CPAREN;
             else if (op == 'x' || op == 'X')
                 type = OperatorType.VARIABLE;
-            else if (op == 's')
-            {
-               sin ++;
-            }
-            else if (op == 'i')
-            {
-                sin ++;
-            }
-            else if (op == 'n' && sin == 2)
+            else if (op == 'n')
                 type = OperatorType.SIN;
+            else if (op == 's')
+                type = OperatorType.COS;
             else if (op == '.')
                 type = OperatorType.TOCKA;
+            else if(op == 'c')
+            {
+                brojac = 1;
+            }
+
+            else if (op == 'g')
+            {
+                if(brojac == 1)
+                type = OperatorType.CTG;
+
+                if(brojac==0)
+                    type = OperatorType.TG;
+            }
+
 
         }
 
@@ -102,7 +112,7 @@ namespace MachineINfix
                 }
 
                 if (c == '+' || c == '-' || c == '*' || c == '/' || c == '^'
-                        || c == '(' || c == ')' || c == 'e' || c == 'E' || c == 'n' || c == '.' )
+                        || c == '(' || c == ')' || c == 'e' || c == 'E' || c == 'n' || c == '.' || c == 's' || c == 'g')
                     e.Add(new OperatorElement(c));
             }
             if (sb.Length > 0)
@@ -118,16 +128,17 @@ namespace MachineINfix
         List<Element> converted = new List<Element>();
         int Precedence(OperatorElement c)
         {
-            if ( c.type == OperatorType.E || c.type == OperatorType.EXPONENTIAL || c.type == OperatorType.TOCKA || c.type == OperatorType.SIN)
+            if ( c.type == OperatorType.E || c.type == OperatorType.EXPONENTIAL || c.type == OperatorType.TOCKA || c.type == OperatorType.SIN || c.type == OperatorType.COS)
                 return 2;
-            else if (c.type == OperatorType.EMALO || c.type == OperatorType.MULTIPLY || c.type == OperatorType.DIVIDE)
+            else if (c.type == OperatorType.TG || c.type == OperatorType.CTG ||c.type == OperatorType.EMALO || c.type == OperatorType.MULTIPLY || c.type == OperatorType.DIVIDE)
                 return 3;
             else if ( c.type == OperatorType.ADD || c.type == OperatorType.SUBTRACT)
                 return 4;
             else if (c.type == OperatorType.VARIABLE)
                 return 5;
             
-            
+
+
             else
                 return Int32.MaxValue;
         }
@@ -252,6 +263,16 @@ namespace MachineINfix
             }  
             else if (op.type == OperatorType.SIN)
                 temp = Math.Sin(right.getNumber());
+            else if (op.type == OperatorType.COS)
+                temp = Math.Cos(right.getNumber());
+            else if (op.type == OperatorType.CTG)
+            {
+                temp = Math.Atan(right.getNumber());
+            }
+            else if (op.type == OperatorType.TG)
+            {
+                temp = Math.Tan(right.getNumber());
+            }
 
             return new NumberElement(temp.ToString());
         }
@@ -382,14 +403,16 @@ namespace MachineINfix
             string exp = Console.ReadLine();
             if (exp.EndsWith("e") || exp.EndsWith("+") || exp.EndsWith("-") ||  exp.EndsWith("E"))
             {
-                expa = "0" + exp + "0";
+                expa = "0" + exp + "0" ;
+                expa = expa.Replace("e", "e0");
             }
             else
             {
                 expa = "0" + exp;
+                expa = expa.Replace("e", "e0");
             }
 
-            expa = exp.Replace("e", "e0");
+            
 
             Console.WriteLine(infixToPostfix(exp));
             Program c = new Program();
